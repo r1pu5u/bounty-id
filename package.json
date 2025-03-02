@@ -1,10 +1,13 @@
 {
+  "homepage": "https://r1pu5u.github.io/bounty-id",
   "name": "nusantara-bug-report",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "predeploy": "npm i",
+    "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

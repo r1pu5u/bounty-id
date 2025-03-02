@@ -2,6 +2,7 @@ import { Routes, Route, Link } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import Program from './pages/Program'
+import Leaderboard from './pages/Leaderboard'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/program" element={<Program />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
       </Routes>
     </div>
   )
