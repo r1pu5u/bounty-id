@@ -1,6 +1,47 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+
+const TESTIMONIALS = [
+  {
+    id: 1,
+    name: "Budi Santoso",
+    role: "Security Researcher",
+    image: "https://i.pravatar.cc/100?img=1",
+    text: "Platform yang luar biasa! Saya telah menemukan 15 bug kritis dan mendapatkan reward total Rp30 juta dalam 3 bulan terakhir."
+  },
+  {
+    id: 2,
+    name: "Dewi Putri",
+    role: "Ethical Hacker",
+    image: "https://i.pravatar.cc/100?img=2",
+    text: "Proses verifikasi bug yang cepat dan transparan. Tim support sangat responsif dan profesional."
+  },
+  {
+    id: 3,
+    name: "Ahmad Rizki",
+    role: "Pentester",
+    image: "https://i.pravatar.cc/100?img=3",
+    text: "BugBountyID membantu saya mengembangkan karir di bidang security. Sistem reward yang kompetitif!"
+  },
+  {
+    id: 4,
+    name: "Sarah Wijaya",
+    role: "Security Engineer",
+    image: "https://i.pravatar.cc/100?img=4",
+    text: "Platform bug bounty terbaik untuk infrastruktur pemerintah. Bangga bisa berkontribusi mengamankan sistem negara."
+  }
+]
 
 function Home() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((current) => (current + 1) % TESTIMONIALS.length);
+    }, 5000); // Change testimonial every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <>
       {/* Hero Section */}
@@ -28,6 +69,48 @@ function Home() {
         <div className="stat-card">
           <h3>500+</h3>
           <p>Peneliti Aktif</p>
+        </div>
+      </section>
+
+      {/* New Testimonials Section */}
+      <section className="testimonials">
+        <h2>Apa Kata Mereka?</h2>
+        <div className="testimonial-container">
+          <div 
+            className="testimonial-slider" 
+            style={{ 
+              transform: `translateX(-${activeIndex * 100}%)`,
+              width: `${TESTIMONIALS.length * 100}%`
+            }}
+          >
+            {TESTIMONIALS.map((testimonial) => (
+              <div key={testimonial.id} className="testimonial-card">
+                <div className="testimonial-content">
+                  <p className="testimonial-text">{testimonial.text}</p>
+                  <div className="testimonial-author">
+                    <img 
+                      src={testimonial.image} 
+                      alt={testimonial.name} 
+                      className="author-image"
+                    />
+                    <div className="author-info">
+                      <h4>{testimonial.name}</h4>
+                      <p>{testimonial.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="testimonial-dots">
+            {TESTIMONIALS.map((_, index) => (
+              <button
+                key={index}
+                className={`dot ${index === activeIndex ? 'active' : ''}`}
+                onClick={() => setActiveIndex(index)}
+              />
+            ))}
+          </div>
         </div>
       </section>
 
