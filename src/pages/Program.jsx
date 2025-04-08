@@ -42,17 +42,34 @@ function Program() {
   const [activeFilter, setActiveFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProvinces, setSelectedProvinces] = useState([])
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false)
 
   const filteredPrograms = PROGRAMS.filter(program => {
     const matchesSearch = program.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesProvince = selectedProvinces.length === 0 || selectedProvinces.includes(program.province)
-    return matchesSearch && matchesProvince
+    const matchesStatus = activeFilter === "all" || 
+      (activeFilter === "active" && program.isActive) ||
+      (activeFilter === "inactive" && !program.isActive)
+    return matchesSearch && matchesProvince && matchesStatus
   })
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible)
+  }
 
   return (
     <div className="program-page">
+      {/* Mobile Filter Toggle Button */}
+      <button 
+        className="filter-toggle-button"
+        onClick={toggleSidebar}
+        aria-label="Toggle filters"
+      >
+        {isSidebarVisible ? 'Tutup Filter' : 'Buka Filter'} ☰
+      </button>
+
       {/* Sidebar */}
-      <aside className="program-sidebar">
+      <aside className={`program-sidebar ${isSidebarVisible ? 'visible' : ''}`}>
         <div className="sidebar-section">
           <h3>Cari Program</h3>
           <input 
@@ -115,7 +132,12 @@ function Program() {
 
       {/* Main Content */}
       <main className="program-content">
-        <h1>Program Bug Bounty</h1>
+        <div className="program-header">
+          <h1>Program Bug Bounty</h1>
+          <p className="results-count">
+            Menampilkan {filteredPrograms.length} program
+          </p>
+        </div>
         <div className="program-grid">
           {filteredPrograms.map(program => (
             <div key={program.id} className="program-card">

@@ -56,7 +56,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 8%;
+  padding: 1rem 8%;
   width: 100%;
   box-sizing: border-box;
 }
@@ -327,5 +327,124 @@ body {
 
   .testimonial-content {
     padding: 1.5rem;
+  }
+}
+
+/* Add hamburger menu styles */
+.mobile-menu-button {
+  display: none;
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* Update nav-links for mobile */
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Add responsive styles */
+@media (max-width: 768px) {
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .nav-links {
+    display: none;
+    position: fixed;
+    top: 72px; /* Height of navbar */
+    left: 0;
+    right: 0;
+    background: rgba(19, 17, 28, 0.95);
+    backdrop-filter: blur(8px);
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .hero-content {
+    margin: 3rem auto;
+    padding: 0 1rem;
+  }
+
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .primary-button, .secondary-button {
+    width: 100%;
+  }
+
+  /* Make stats section responsive */
+  .stats {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem 1rem;
+  }
+
+  .stat-card h3 {
+    font-size: 2rem;
+  }
+
+  /* Adjust features section for mobile */
+  .features {
+    padding: 2rem 1rem;
+  }
+
+  .features h2 {
+    font-size: 2rem;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Adjust testimonials for mobile */
+  .testimonials {
+    padding: 2rem 1rem;
+  }
+
+  .testimonials h2 {
+    font-size: 2rem;
+  }
+
+  .testimonial-content {
+    padding: 1rem;
+  }
+
+  .testimonial-text {
+    font-size: 0.9rem;
+  }
+}
+
+/* Add small mobile styles */
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 2rem;
+  }
+
+  .navbar {
+    padding: 1rem 1rem;
+  }
+
+  .logo a {
+    font-size: 1.25rem;
   }
 }
