@@ -1,22 +1,13 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext } from 'react'
 
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  
-  const login = (userData) => {
-    setUser(userData)
-    // Add login logic
-  }
-  
-  const logout = () => {
-    setUser(null)
-    // Add logout logic
-  }
-  
+  // Tidak ada state atau logic auth di sini
+  // Anda bisa menambahkan logic auth dari backend nanti
+
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{}}>
       {children}
     </AuthContext.Provider>
   )

@@ -9,6 +9,14 @@ import Register from './pages/Register'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import ForgotPassword from './pages/ForgotPassword'
+import UserDashboard from './pages/UserDashboard'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminRoute from './components/AdminRoute'
+import UserRoute from './components/UserRoute'
+import MyReports from './pages/MyReports'
+import UpdateProfile from './pages/UpdateProfile'
+import NewBugReport from './pages/NewBugReport'
+import Payment from './pages/Payment'
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -60,6 +68,19 @@ function App() {
             } 
           />
           <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/my-reports" element={<MyReports />} />
+          <Route path="/update-profile" element={<UpdateProfile />} />
+          <Route path="/new-bug" element={<NewBugReport />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </div>
     </AuthProvider>
