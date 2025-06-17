@@ -12,6 +12,7 @@ dist
 dist-ssr
 .env
 */node_modules
+*/uploads/*
 *.local
 
 # Editor directories and files
