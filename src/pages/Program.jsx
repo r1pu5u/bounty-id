@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import './Program.css'
+import { programAPI } from '../services/api'
 
 const PROVINCES = [
   "Jawa Barat", "DKI Jakarta", "Jawa Tengah", "Jawa Timur", 
@@ -39,12 +40,32 @@ const PROGRAMS = [
 ]
 
 function Program() {
+  const [programs, setPrograms] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [activeFilter, setActiveFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedProvinces, setSelectedProvinces] = useState([])
   const [isSidebarVisible, setIsSidebarVisible] = useState(false)
 
-  const filteredPrograms = PROGRAMS.filter(program => {
+  useEffect(() => {
+    fetchPrograms()
+  }, [])
+
+  const fetchPrograms = async () => {
+    try {
+      setLoading(true)
+      const response = await programAPI.getAll()
+      setPrograms(response.data)
+    } catch (err) {
+      console.error('Error fetching programs:', err)
+      setError('Gagal mengambil data program')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredPrograms = programs.filter(program => {
     const matchesSearch = program.name.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesProvince = selectedProvinces.length === 0 || selectedProvinces.includes(program.province)
     const matchesStatus = activeFilter === "all" || 
@@ -56,6 +77,9 @@ function Program() {
   const toggleSidebar = () => {
     setIsSidebarVisible(!isSidebarVisible)
   }
+
+  if (loading) return <div>Loading...</div>
+  if (error) return <div className="error-message">{error}</div>
 
   return (
     <div className="program-page">

@@ -1,40 +1,47 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import './Auth.css'
+import { authAPI } from '../services/api'
 
 function Register() {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
-    fullName: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: '',
   })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const [errors, setErrors] = useState({})
-
-  const validateForm = () => {
-    const newErrors = {}
-    
-    if (formData.password.length < 8) {
-      newErrors.password = 'Password harus minimal 8 karakter'
-    }
-    
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Password tidak cocok'
-    }
-    
-    if (!formData.email.includes('@')) {
-      newErrors.email = 'Email tidak valid'
-    }
-
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (validateForm()) {
-      // Proceed with registration
+    setError('')
+    setLoading(true)
+
+    // Validasi password
+    if (formData.password !== formData.confirmPassword) {
+      setError('Password tidak cocok')
+      setLoading(false)
+      return
+    }
+
+    try {
+      const response = await authAPI.register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      })
+
+      // Simpan token
+      localStorage.setItem('token', response.data.token)
+      
+      // Redirect ke dashboard
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Registrasi gagal')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -47,14 +54,16 @@ function Register() {
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
+          {error && <div className="error-message">{error}</div>}
+
           <div className="form-group">
-            <label htmlFor="fullName">Nama Lengkap</label>
+            <label htmlFor="username">Username</label>
             <input
               type="text"
-              id="fullName"
-              value={formData.fullName}
-              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
-              placeholder="Masukkan nama lengkap"
+              id="username"
+              value={formData.username}
+              onChange={(e) => setFormData({...formData, username: e.target.value})}
+              placeholder="Masukkan username"
               required
             />
           </div>
@@ -102,8 +111,8 @@ function Register() {
             </label>
           </div>
 
-          <button type="submit" className="auth-button">
-            Daftar
+          <button type="submit" disabled={loading} className="auth-button">
+            {loading ? 'Loading...' : 'Daftar'}
           </button>
         </form>
 

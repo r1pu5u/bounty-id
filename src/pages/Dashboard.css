@@ -8,6 +8,9 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.15);
   position: relative;
   overflow: hidden;
+  /* background-color: red !important;
+  border: 2px solid yellow !important; */
+  min-height: 100vh;
 }
 
 .dashboard-gradient {
@@ -454,4 +457,187 @@
 .update-profile-field select {
   width: 100%;
   box-sizing: border-box;
+}
+
+.report-detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.report-id {
+  font-size: 1.2rem;
+  color: #00FFA3;
+  font-weight: 600;
+}
+
+.report-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-group {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.info-group label {
+  display: block;
+  color: #B4B4B4;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.report-content {
+  margin-bottom: 2rem;
+}
+
+.report-content h2 {
+  color: #00FFA3;
+  margin: 1.5rem 0 1rem;
+}
+
+.attachments {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.attachment-link {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  color: #00FFA3;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.attachment-link:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.verification-section {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.verification-note {
+  width: 100%;
+  min-height: 100px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  padding: 1rem;
+  color: white;
+  margin: 1rem 0;
+  resize: vertical;
+}
+
+.verification-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.verify-btn {
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.verify-btn:hover {
+  opacity: 0.9;
+}
+
+.verify-btn.accept {
+  background: #00FFA3;
+  color: #121212;
+}
+
+.verify-btn.reject {
+  background: #FF4444;
+  color: white;
+}
+
+.back-btn {
+  display: block;
+  margin: 2rem auto 0;
+  padding: 0.75rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.pdf-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.pdf-section h2 {
+  color: #00FFA3;
+  margin-bottom: 1rem;
+}
+
+.pdf-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.view-pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #00FFA3;
+  color: #121212;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.view-pdf-btn:hover {
+  opacity: 0.9;
+}
+
+.view-pdf-btn i {
+  font-size: 1.2rem;
+}
+
+.pdf-filename {
+  color: #B4B4B4;
+  font-size: 0.9rem;
+}
+
+.no-pdf {
+  color: #B4B4B4;
+  font-style: italic;
 } 

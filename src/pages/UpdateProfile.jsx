@@ -1,33 +1,51 @@
 import { useState, useEffect, useRef } from 'react'
+import { userAPI } from '../services/api'
 import './Dashboard.css'
 
 function UpdateProfile() {
-  // Ambil avatar dari localStorage jika ada
-  const storedAvatar = localStorage.getItem('user_avatar')
   const [form, setForm] = useState({
-    fullName: 'Nama Pengguna',
-    email: 'user@email.com',
+    fullName: '',
+    email: '',
     phone: '',
     bio: '',
-    avatar: storedAvatar || '',
+    avatar: '',
   })
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const fileInputRef = useRef(null)
 
-  // Saat avatar berubah, simpan ke localStorage
   useEffect(() => {
-    if (form.avatar) {
-      localStorage.setItem('user_avatar', form.avatar)
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error('No token found');
+      // Redirect ke login jika tidak ada token
+      window.location.href = '/login';
+      return;
     }
-  }, [form.avatar])
-
-  // Saat komponen mount, ambil avatar dari localStorage (jaga-jaga)
-  useEffect(() => {
-    const saved = localStorage.getItem('user_avatar')
-    if (saved && !form.avatar) {
-      setForm(f => ({ ...f, avatar: saved }))
-    }
+    fetchProfile()
   }, [])
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true)
+      const response = await userAPI.getProfile()
+      const userData = response.data
+      
+      setForm({
+        fullName: userData.username || '',
+        email: userData.email || '',
+        phone: userData.phone || '',
+        bio: userData.bio || '',
+        avatar: userData.avatar || '',
+      })
+    } catch (err) {
+      console.error('Error fetching profile:', err)
+      setError('Gagal mengambil data profile')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value, files } = e.target
@@ -42,11 +60,35 @@ function UpdateProfile() {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Send update to backend
-    setSuccess(true)
-    setTimeout(() => setSuccess(false), 2500)
+    setLoading(true)
+    setError('')
+    setSuccess(false)
+
+    try {
+      await userAPI.updateProfile({
+        fullName: form.fullName,
+        phone: form.phone,
+        bio: form.bio,
+        avatar: form.avatar
+      })
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 2500)
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal update profile')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (loading && !form.email) {
+    return (
+      <div className="dashboard-page dashboard-page--wide">
+        <div className="dashboard-gradient" />
+        <div className="loading-state">Loading profile data...</div>
+      </div>
+    )
   }
 
   return (
@@ -54,6 +96,9 @@ function UpdateProfile() {
       <div className="dashboard-gradient" />
       <h1>Update Profil</h1>
       <p>Perbarui data profil Anda di bawah ini.</p>
+
+      {error && <div className="error-message">{error}</div>}
+
       <form className="update-profile-form" onSubmit={handleSubmit} autoComplete="off">
         <div className="update-profile-avatar update-profile-avatar--center">
           <label htmlFor="avatar-upload" className="update-profile-avatar-label">
@@ -118,8 +163,13 @@ function UpdateProfile() {
             />
           </div>
         </div>
-        <button className="dashboard-action-btn" type="submit" style={{ marginTop: 24 }}>
-          Simpan Perubahan
+        <button 
+          className="dashboard-action-btn" 
+          type="submit" 
+          style={{ marginTop: 24 }}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : 'Simpan Perubahan'}
         </button>
         {success && (
           <div className="update-profile-success">

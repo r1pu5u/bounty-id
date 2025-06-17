@@ -1,0 +1,148 @@
+/* src/pages/MyReports.css */
+
+.myreports-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.myreports-search {
+  flex-grow: 1;
+  padding: 0.8rem 1rem;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  font-size: 1rem;
+  outline: none;
+  max-width: 400px; /* Optional: limit search bar width */
+}
+
+.myreports-search::placeholder {
+  color: #888;
+}
+
+.myreports-filter {
+  padding: 0.8rem 1rem;
+  border: 1px solid #3c3c3c;
+  border-radius: 8px;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+  font-size: 1rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.myreports-filter option {
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.myreports-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  overflow: hidden; /* Ensures rounded corners apply to content */
+}
+
+.myreports-table thead {
+  background-color: #2a2a2a;
+}
+
+.myreports-table th,
+.myreports-table td {
+  padding: 1rem 1.2rem;
+  text-align: left;
+  border-bottom: 1px solid #333;
+  color: #e0e0e0;
+}
+
+.myreports-table th {
+  font-weight: 600;
+  color: #00FFA3;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.myreports-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.myreports-table tbody tr:hover {
+  background-color: #252525;
+}
+
+.myreports-table--full {
+  max-width: 1400px; /* Lebar maksimum tabel */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.lihat-laporan-btn {
+  background-color: #00FFA3;
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: background-color 0.2s ease;
+}
+
+.lihat-laporan-btn:hover {
+  background-color: #00e68e;
+}
+
+/* Pagination styles */
+.myreports-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.myreports-page-btn {
+  background-color: #2a2a2a;
+  color: #e0e0e0;
+  border: 1px solid #3c3c3c;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.myreports-page-btn:disabled {
+  background-color: #1a1a1a;
+  border-color: #2a2a2a;
+  color: #555;
+  cursor: not-allowed;
+}
+
+.myreports-page-btn:not(:disabled):hover {
+  background-color: #3c3c3c;
+  border-color: #00FFA3;
+}
+
+.myreports-page-info {
+  color: #e0e0e0;
+  font-size: 1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .myreports-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .myreports-search,
+  .myreports-filter {
+    max-width: 100%;
+  }
+} 

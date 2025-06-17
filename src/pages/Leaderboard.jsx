@@ -1,90 +1,65 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { userAPI } from '../services/api'
 import './Leaderboard.css'
 
-const TOP_HACKERS = [
-  {
-    rank: 1,
-    username: "whitehat_id",
-    points: 15750,
-    bugsReported: 47,
-    criticalFinds: 12,
-    totalRewards: "Rp 45.000.000"
-  },
-  {
-    rank: 2,
-    username: "securehunter",
-    points: 12800,
-    bugsReported: 38,
-    criticalFinds: 8,
-    totalRewards: "Rp 32.500.000"
-  },
-  {
-    rank: 3,
-    username: "cyberdefender",
-    points: 11200,
-    bugsReported: 35,
-    criticalFinds: 7,
-    totalRewards: "Rp 28.750.000"
-  },
-  {
-    rank: 4,
-    username: "ethicalhacker_88",
-    points: 9800,
-    bugsReported: 29,
-    criticalFinds: 6,
-    totalRewards: "Rp 24.000.000"
-  },
-  {
-    rank: 5,
-    username: "securityninja",
-    points: 8900,
-    bugsReported: 27,
-    criticalFinds: 5,
-    totalRewards: "Rp 21.500.000"
-  },
-  {
-    rank: 6,
-    username: "bugfinder_pro",
-    points: 7500,
-    bugsReported: 24,
-    criticalFinds: 4,
-    totalRewards: "Rp 18.750.000"
-  },
-  {
-    rank: 7,
-    username: "pentester_id",
-    points: 6800,
-    bugsReported: 21,
-    criticalFinds: 3,
-    totalRewards: "Rp 15.000.000"
-  },
-  {
-    rank: 8,
-    username: "vulnhunter",
-    points: 6200,
-    bugsReported: 19,
-    criticalFinds: 3,
-    totalRewards: "Rp 13.500.000"
-  },
-  {
-    rank: 9,
-    username: "cybersec_hero",
-    points: 5500,
-    bugsReported: 17,
-    criticalFinds: 2,
-    totalRewards: "Rp 11.250.000"
-  },
-  {
-    rank: 10,
-    username: "secure_warrior",
-    points: 4800,
-    bugsReported: 15,
-    criticalFinds: 2,
-    totalRewards: "Rp 9.750.000"
-  }
-]
-
 function Leaderboard() {
+  const [hackers, setHackers] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetchLeaderboard()
+  }, [])
+
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true)
+      const response = await userAPI.getLeaderboard()
+      // Transform data untuk menambahkan informasi tambahan
+      const transformedData = response.data.map((user, index) => ({
+        rank: index + 1,
+        username: user.username,
+        points: user.points || 0,
+        bugsReported: user.bugsReported || 0,
+        criticalFinds: user.criticalFinds || 0,
+        totalRewards: formatReward(user.totalRewards || 0)
+      }))
+      setHackers(transformedData)
+    } catch (err) {
+      console.error('Error fetching leaderboard:', err)
+      setError('Gagal mengambil data leaderboard')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Helper function untuk format reward
+  const formatReward = (amount) => {
+    return `Rp ${amount.toLocaleString('id-ID')}`
+  }
+
+  if (loading) {
+    return (
+      <div className="leaderboard-page">
+        <div className="leaderboard-container">
+          <h1>Top Bug Hunters</h1>
+          <div className="loading-state">Loading leaderboard data...</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="leaderboard-page">
+        <div className="leaderboard-container">
+          <h1>Top Bug Hunters</h1>
+          <div className="error-message">{error}</div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="leaderboard-page">
       <div className="leaderboard-container">
@@ -106,7 +81,7 @@ function Leaderboard() {
               </tr>
             </thead>
             <tbody>
-              {TOP_HACKERS.map((hacker) => (
+              {hackers.map((hacker) => (
                 <tr key={hacker.rank} className={hacker.rank <= 3 ? 'top-three' : ''}>
                   <td>
                     <span className={`rank rank-${hacker.rank}`}>

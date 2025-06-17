@@ -1,22 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { programAPI, reportAPI } from '../services/api'
 import './Dashboard.css'
-
-const PROGRAMS = [
-  'Kota Bandung',
-  'DKI Jakarta',
-  'Jawa Barat',
-  'Jawa Tengah',
-  'Jawa Timur',
-  'Bali',
-  'Sumatera Utara',
-  'Sulawesi Selatan',
-]
 
 const SEVERITIES = ['Low', 'Medium', 'High', 'Critical']
 
 function NewBugReport() {
+  const [programs, setPrograms] = useState([])
   const [form, setForm] = useState({
-    program: '',
+    programId: '',
     title: '',
     severity: '',
     description: '',
@@ -24,7 +15,23 @@ function NewBugReport() {
     poc: '',
     attachment: null,
   })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    fetchPrograms()
+  }, [])
+
+  const fetchPrograms = async () => {
+    try {
+      const response = await programAPI.getAll()
+      setPrograms(response.data)
+    } catch (err) {
+      console.error('Error fetching programs:', err)
+      setError('Gagal mengambil data program')
+    }
+  }
 
   const handleChange = (e) => {
     const { name, value, files } = e.target
@@ -35,20 +42,41 @@ function NewBugReport() {
     }
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Send to backend
-    setSuccess(true)
-    setTimeout(() => setSuccess(false), 2500)
-    setForm({
-      program: '',
-      title: '',
-      severity: '',
-      description: '',
-      steps: '',
-      poc: '',
-      attachment: null,
-    })
+    setLoading(true)
+    setError('')
+    setSuccess(false)
+
+    try {
+      const formData = new FormData()
+      formData.append('programId', form.programId)
+      formData.append('title', form.title)
+      formData.append('severity', form.severity)
+      formData.append('description', form.description)
+      formData.append('steps', form.steps)
+      formData.append('poc', form.poc)
+      if (form.attachment) {
+        formData.append('attachment', form.attachment)
+      }
+
+      await reportAPI.create(formData)
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 2500)
+      setForm({
+        programId: '',
+        title: '',
+        severity: '',
+        description: '',
+        steps: '',
+        poc: '',
+        attachment: null,
+      })
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal mengirim laporan')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -56,19 +84,24 @@ function NewBugReport() {
       <div className="dashboard-gradient" />
       <h1>Buat Laporan Bug Baru</h1>
       <p>Laporkan kerentanan yang Anda temukan pada sistem pemerintah.</p>
+
+      {error && <div className="error-message">{error}</div>}
+
       <form className="update-profile-form" onSubmit={handleSubmit} autoComplete="off">
         <div className="update-profile-fields">
           <div className="update-profile-field">
             <label>Program</label>
             <select
-              name="program"
-              value={form.program}
+              name="programId"
+              value={form.programId}
               onChange={handleChange}
               required
             >
               <option value="">Pilih Program</option>
-              {PROGRAMS.map((p) => (
-                <option key={p} value={p}>{p}</option>
+              {programs.map((program) => (
+                <option key={program.id} value={program.id}>
+                  {program.name} - {program.province}
+                </option>
               ))}
             </select>
           </div>
@@ -144,8 +177,13 @@ function NewBugReport() {
             )}
           </div>
         </div>
-        <button className="dashboard-action-btn" type="submit" style={{ marginTop: 24 }}>
-          Kirim Laporan
+        <button 
+          className="dashboard-action-btn" 
+          type="submit" 
+          style={{ marginTop: 24 }}
+          disabled={loading}
+        >
+          {loading ? 'Mengirim...' : 'Kirim Laporan'}
         </button>
         {success && (
           <div className="update-profile-success">

@@ -1,122 +1,12 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { reportAPI } from '../services/api'
 import './Dashboard.css'
 
-const REPORTS = [
-  {
-    id: 'BB-001',
-    title: 'SQL Injection di login admin',
-    program: 'Kota Bandung',
-    severity: 'Critical',
-    status: 'Diterima',
-    reward: 'Rp 2.500.000',
-    date: '2024-06-01',
-  },
-  {
-    id: 'BB-002',
-    title: 'XSS pada halaman pencarian',
-    program: 'DKI Jakarta',
-    severity: 'Medium',
-    status: 'Pending',
-    reward: '-',
-    date: '2024-06-10',
-  },
-  {
-    id: 'BB-003',
-    title: 'Directory Traversal',
-    program: 'Jawa Barat',
-    severity: 'High',
-    status: 'Ditolak',
-    reward: '-',
-    date: '2024-06-15',
-  },
-  // Tambahkan data dummy lain jika perlu
-  {
-    id: 'BB-004',
-    title: 'CSRF pada form kontak',
-    program: 'Bali',
-    severity: 'Low',
-    status: 'Diterima',
-    reward: 'Rp 500.000',
-    date: '2024-06-18',
-  },
-  {
-    id: 'BB-005',
-    title: 'Open Redirect',
-    program: 'Sumatera Utara',
-    severity: 'Medium',
-    status: 'Pending',
-    reward: '-',
-    date: '2024-06-20',
-  },
-  {
-    id: 'BB-006',
-    title: 'Sensitive Data Exposure',
-    program: 'Jawa Tengah',
-    severity: 'High',
-    status: 'Diterima',
-    reward: 'Rp 1.500.000',
-    date: '2024-06-22',
-  },
-  {
-    id: 'BB-007',
-    title: 'Broken Authentication',
-    program: 'Jawa Timur',
-    severity: 'Critical',
-    status: 'Pending',
-    reward: '-',
-    date: '2024-06-23',
-  },
-  {
-    id: 'BB-008',
-    title: 'IDOR pada endpoint API',
-    program: 'Sulawesi Selatan',
-    severity: 'High',
-    status: 'Diterima',
-    reward: 'Rp 1.800.000',
-    date: '2024-06-24',
-  },
-  {
-    id: 'BB-009',
-    title: 'Clickjacking',
-    program: 'DKI Jakarta',
-    severity: 'Low',
-    status: 'Ditolak',
-    reward: '-',
-    date: '2024-06-25',
-  },
-  {
-    id: 'BB-010',
-    title: 'Path Traversal',
-    program: 'Jawa Barat',
-    severity: 'Medium',
-    status: 'Diterima',
-    reward: 'Rp 900.000',
-    date: '2024-06-26',
-  },
-  {
-    id: 'BB-011',
-    title: 'Privilege Escalation',
-    program: 'Kota Bandung',
-    severity: 'Critical',
-    status: 'Diterima',
-    reward: 'Rp 3.000.000',
-    date: '2024-06-27',
-  },
-  {
-    id: 'BB-012',
-    title: 'Insecure Direct Object Reference',
-    program: 'Bali',
-    severity: 'High',
-    status: 'Pending',
-    reward: '-',
-    date: '2024-06-28',
-  },
-]
-
 const statusColor = {
-  Diterima: '#00FFA3',
+  Accepted: '#00FFA3',
   Pending: '#FFC400',
-  Ditolak: '#FF4444',
+  'In Review': '#FFC400',
+  Rejected: '#FF4444',
 }
 
 const severityColor = {
@@ -126,23 +16,43 @@ const severityColor = {
   Critical: '#FF4444',
 }
 
-const STATUS_OPTIONS = ['Semua', 'Diterima', 'Pending', 'Ditolak']
+const STATUS_OPTIONS = ['Semua', 'Pending', 'In Review', 'Accepted', 'Rejected']
 const SEVERITY_OPTIONS = ['Semua', 'Low', 'Medium', 'High', 'Critical']
 
 const PAGE_SIZE = 6
 
 function MyReports() {
+  const [reports, setReports] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('Semua')
   const [severity, setSeverity] = useState('Semua')
   const [page, setPage] = useState(1)
 
+  useEffect(() => {
+    fetchReports()
+  }, [])
+
+  const fetchReports = async () => {
+    try {
+      setLoading(true)
+      const response = await reportAPI.getAll()
+      setReports(response.data)
+    } catch (err) {
+      console.error('Error fetching reports:', err)
+      setError('Gagal mengambil data laporan')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   // Filter logic
-  const filtered = REPORTS.filter(r => {
+  const filtered = reports.filter(r => {
     const matchSearch =
       r.title.toLowerCase().includes(search.toLowerCase()) ||
-      r.program.toLowerCase().includes(search.toLowerCase()) ||
-      r.id.toLowerCase().includes(search.toLowerCase())
+      r.Program?.name.toLowerCase().includes(search.toLowerCase()) ||
+      `BB-${String(r.id).padStart(3, '0')}`.toLowerCase().includes(search.toLowerCase())
     const matchStatus = status === 'Semua' ? true : r.status === status
     const matchSeverity = severity === 'Semua' ? true : r.severity === severity
     return matchSearch && matchStatus && matchSeverity
@@ -158,6 +68,26 @@ function MyReports() {
       fn(e.target.value)
       setPage(1)
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="dashboard-page dashboard-page--full">
+        <div className="dashboard-gradient" />
+        <h1>Laporan Saya</h1>
+        <p>Memuat data...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-page dashboard-page--full">
+        <div className="dashboard-gradient" />
+        <h1>Laporan Saya</h1>
+        <p style={{ color: '#FF4444' }}>{error}</p>
+      </div>
+    )
   }
 
   return (
@@ -201,7 +131,6 @@ function MyReports() {
               <th>Program</th>
               <th>Severity</th>
               <th>Status</th>
-              <th>Reward</th>
               <th>Tanggal</th>
               <th></th>
             </tr>
@@ -209,16 +138,16 @@ function MyReports() {
           <tbody>
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{textAlign: 'center', color: '#B4B4B4', padding: '2rem'}}>
+                <td colSpan={7} style={{textAlign: 'center', color: '#B4B4B4', padding: '2rem'}}>
                   Tidak ada laporan ditemukan.
                 </td>
               </tr>
             ) : (
               paginated.map(report => (
                 <tr key={report.id}>
-                  <td>{report.id}</td>
+                  <td>BB-{String(report.id).padStart(3, '0')}</td>
                   <td>{report.title}</td>
-                  <td>{report.program}</td>
+                  <td>{report.Program?.name}</td>
                   <td>
                     <span
                       style={{
@@ -239,12 +168,11 @@ function MyReports() {
                       {report.status}
                     </span>
                   </td>
-                  <td>{report.reward}</td>
-                  <td>{report.date}</td>
+                  <td>{new Date(report.createdAt).toLocaleDateString('id-ID')}</td>
                   <td>
                     <button
                       className="lihat-laporan-btn"
-                      onClick={() => alert(`Lihat detail laporan ${report.id}`)}
+                      onClick={() => alert(`Lihat detail laporan BB-${String(report.id).padStart(3, '0')}`)}
                     >
                       Lihat
                     </button>

@@ -448,3 +448,45 @@ body {
     font-size: 1.25rem;
   }
 }
+
+.dashboard-link {
+  color: #00FFA3;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.dashboard-link:hover {
+  background: rgba(0, 255, 163, 0.1);
+}
+
+.logout-button {
+  background: none;
+  border: 1px solid #FF4444;
+  color: #FF4444;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-left: 1rem;
+}
+
+.logout-button:hover {
+  background: #FF4444;
+  color: white;
+}
+
+/* Update mobile menu styles */
+@media (max-width: 768px) {
+  .nav-links.active {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .logout-button {
+    margin-left: 0;
+    width: 100%;
+  }
+}
