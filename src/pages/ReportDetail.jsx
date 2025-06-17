@@ -28,16 +28,25 @@ function ReportDetail() {
   const [status, setStatus] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
 
+  // Tambahkan state untuk user
+  const [user, setUser] = useState(null);
+
   useEffect(() => {
+    // Ambil data user dari local storage
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUser(userData);
     fetchReportDetail();
   }, [id]);
 
   const fetchReportDetail = async () => {
     try {
+      setLoading(true);
+      setError('');
       const response = await adminAPI.getReportDetail(id);
       setReport(response.data);
       setStatus(response.data.status);
     } catch (err) {
+      console.error('Error fetching report:', err);
       setError(err.response?.data?.message || 'Gagal mengambil detail laporan');
     } finally {
       setLoading(false);

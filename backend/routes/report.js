@@ -37,15 +37,24 @@ router.post('/', protect, upload.single('attachment'), async (req, res) => {
     }
 
     const reportData = {
-      ...req.body,
-      attachment: req.file ? req.file.filename : null // Simpan hanya nama file
+      programId,
+      title,
+      severity,
+      description,
+      steps,
+      poc,
+      reporterId: req.user.id,
+      attachment: req.file ? req.file.filename : null
     };
 
     const report = await Report.create(reportData);
     res.status(201).json(report);
   } catch (error) {
     console.error('Error creating report:', error);
-    res.status(500).json({ message: 'Error creating report' });
+    res.status(500).json({ 
+      message: 'Error creating report',
+      error: error.message 
+    });
   }
 });
 
