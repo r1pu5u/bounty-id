@@ -129,7 +129,7 @@ router.get('/reports/:id', async (req, res) => {
 // Verify report
 router.put('/reports/:id/verify', async (req, res) => {
   try {
-    const { status, verificationNote } = req.body;
+    const { status, verificationNote, reward } = req.body;
     const report = await Report.findByPk(req.params.id);
 
     if (!report) {
@@ -139,7 +139,8 @@ router.put('/reports/:id/verify', async (req, res) => {
     await report.update({
       status,
       verificationNote,
-      verifiedAt: new Date()
+      verifiedAt: new Date(),
+      reward: reward !== undefined ? reward : report.reward
     });
 
     res.json({ message: 'Laporan berhasil diverifikasi' });

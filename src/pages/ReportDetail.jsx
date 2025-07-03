@@ -27,6 +27,7 @@ function ReportDetail() {
   const [verificationNote, setVerificationNote] = useState('');
   const [status, setStatus] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [payout, setPayout] = useState('');
 
   // Tambahkan state untuk user
   const [user, setUser] = useState(null);
@@ -55,12 +56,16 @@ function ReportDetail() {
 
   const handleVerify = async (newStatus) => {
     try {
+      setError('');
+      // Kirim payout jika status Accepted
       await adminAPI.verifyReport(id, {
         status: newStatus,
-        verificationNote
+        verificationNote,
+        reward: newStatus === 'Accepted' ? payout : undefined
       });
       setStatus(newStatus);
       alert('Status laporan berhasil diperbarui');
+      fetchReportDetail();
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memverifikasi laporan');
     }
@@ -124,6 +129,10 @@ function ReportDetail() {
             <label>Tanggal Dilaporkan</label>
             <div>{new Date(report.createdAt).toLocaleDateString('id-ID')}</div>
           </div>
+          <div className="info-group">
+            <label>Reward</label>
+            <div>Rp {Number(report.reward).toLocaleString('id-ID')}</div>
+          </div>
         </div>
 
         <div className="report-content">
@@ -177,7 +186,7 @@ function ReportDetail() {
           )}
         </div>
 
-        {report.status === 'Pending' && (
+        {report.status === 'Pending' && user?.role !== 'user' && (
           <div className="verification-section">
             <h2>Verifikasi Laporan</h2>
             <textarea
@@ -186,10 +195,25 @@ function ReportDetail() {
               placeholder="Tambahkan catatan verifikasi..."
               className="verification-note"
             />
+            {/* Input payout jika status akan di-accept */}
+            <div style={{ margin: '1rem 0' }}>
+              <label style={{ color: '#00FFA3', fontWeight: 600 }}>Payout (Rp)</label>
+              <input
+                type="number"
+                min="0"
+                value={payout}
+                onChange={e => setPayout(e.target.value)}
+                placeholder="Masukkan nominal payout"
+                className="verification-note"
+                style={{ width: '100%', marginTop: '0.5rem' }}
+                disabled={status === 'Accepted'}
+              />
+            </div>
             <div className="verification-actions">
               <button 
                 className="verify-btn accept"
                 onClick={() => handleVerify('Accepted')}
+                disabled={!payout}
               >
                 Terima
               </button>

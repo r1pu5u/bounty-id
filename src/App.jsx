@@ -1,3 +1,4 @@
+
 import { Routes, Route, Link, Navigate } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import './App.css'
@@ -19,6 +20,7 @@ import NewBugReport from './pages/NewBugReport'
 import Payment from './pages/Payment'
 import ReportDetail from './pages/ReportDetail'
 import { useNavigate } from 'react-router-dom'
+import AdminPrograms from './pages/AdminPrograms'
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -141,6 +143,14 @@ function App() {
             }
           />
           <Route path="/admin/reports/:id" element={<ReportDetail />} />
+          <Route
+            path="/admin/programs"
+            element={
+              <AdminRoute>
+                <AdminPrograms />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </div>
     </AuthProvider>

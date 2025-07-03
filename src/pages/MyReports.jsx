@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { reportAPI } from '../services/api'
 import './Dashboard.css'
+import { useNavigate } from 'react-router-dom'
 
 const statusColor = {
   Accepted: '#00FFA3',
@@ -29,6 +30,7 @@ function MyReports() {
   const [status, setStatus] = useState('Semua')
   const [severity, setSeverity] = useState('Semua')
   const [page, setPage] = useState(1)
+  const navigate = useNavigate()
 
   useEffect(() => {
     fetchReports()
@@ -172,7 +174,7 @@ function MyReports() {
                   <td>
                     <button
                       className="lihat-laporan-btn"
-                      onClick={() => alert(`Lihat detail laporan BB-${String(report.id).padStart(3, '0')}`)}
+                      onClick={() => navigate(`/admin/reports/${report.id}`)}
                     >
                       Lihat
                     </button>

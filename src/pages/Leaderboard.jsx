@@ -15,8 +15,10 @@ function Leaderboard() {
     try {
       setLoading(true)
       const response = await userAPI.getLeaderboard()
+      // Filter user dengan role admin
+      const filtered = response.data.filter(user => user.role !== 'admin')
       // Transform data untuk menambahkan informasi tambahan
-      const transformedData = response.data.map((user, index) => ({
+      const transformedData = filtered.map((user, index) => ({
         rank: index + 1,
         username: user.username,
         points: user.points || 0,

@@ -159,7 +159,7 @@
 
 /* Perbesar dashboard-page khusus halaman laporan */
 .dashboard-page.dashboard-page--wide {
-  max-width: 900px;
+  max-width: 1400px;
 }
 
 @media (max-width: 1000px) {

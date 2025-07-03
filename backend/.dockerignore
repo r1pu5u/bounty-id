@@ -1,0 +1,6 @@
+# umum
+.git
+node_modules
+build
+# jangan ikutkan sumber backend di image frontend
+backend

@@ -26,9 +26,10 @@ const PAGE_SIZE = 5
 function AdminDashboard() {
   console.log('AdminDashboard: Component is rendering')
   const [stats, setStats] = useState({
-    programs: 0,
-    pending: 0,
-    users: 0,
+    totalReports: 0,
+    pendingReports: 0,
+    acceptedReports: 0,
+    rejectedReports: 0,
     totalRewards: 0
   })
   const [reports, setReports] = useState([])
@@ -99,6 +100,10 @@ function AdminDashboard() {
     setCurrentPage(1)
   }
 
+  const handleKelolaProgram = () => {
+    navigate('/admin/programs')
+  }
+
   if (loading) {
     console.log('AdminDashboard: Rendering Loading state')
     return (
@@ -129,16 +134,20 @@ function AdminDashboard() {
       <p>Halo, <b>{user?.username}</b>! Berikut ringkasan sistem.</p>
       <div className="dashboard-cards">
         <div className="dashboard-card">
-          <div className="card-title">Program Aktif</div>
-          <div className="card-value">{stats.programs}</div>
+          <div className="card-title">Total Laporan</div>
+          <div className="card-value">{stats.totalReports}</div>
         </div>
         <div className="dashboard-card">
           <div className="card-title">Laporan Pending</div>
-          <div className="card-value">{stats.pending}</div>
+          <div className="card-value">{stats.pendingReports}</div>
         </div>
         <div className="dashboard-card">
-          <div className="card-title">Total Pengguna</div>
-          <div className="card-value">{stats.users}</div>
+          <div className="card-title">Laporan Diterima</div>
+          <div className="card-value">{stats.acceptedReports}</div>
+        </div>
+        <div className="dashboard-card">
+          <div className="card-title">Laporan Ditolak</div>
+          <div className="card-value">{stats.rejectedReports}</div>
         </div>
         <div className="dashboard-card">
           <div className="card-title">Total Reward</div>
@@ -146,7 +155,7 @@ function AdminDashboard() {
         </div>
       </div>
       <div className="dashboard-actions">
-        <button className="dashboard-action-btn">Kelola Program</button>
+        <button className="dashboard-action-btn" onClick={handleKelolaProgram}>Kelola Program</button>
         <button className="dashboard-action-btn">Verifikasi Laporan</button>
         <button className="dashboard-action-btn">Kelola Pengguna</button>
       </div>

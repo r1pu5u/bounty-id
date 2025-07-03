@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { User } = require('../models');
+const { User, Report } = require('../models');
 const { protect } = require('../middleware/auth');
+const { Op } = require('sequelize');
 
 // Debug middleware untuk route user
 router.use((req, res, next) => {
@@ -24,7 +25,14 @@ router.get('/profile', protect, async (req, res) => {
       return res.status(404).json({ message: 'User tidak ditemukan' });
     }
 
-    console.log('User found:', user.id); // Debug log
+    // Hitung jumlah laporan yang diterima (Accepted)
+    const bugsAccepted = await Report.count({
+      where: {
+        reporterId: user.id,
+        status: 'Accepted'
+      }
+    });
+
     res.json({
       id: user.id,
       username: user.username,
@@ -33,7 +41,11 @@ router.get('/profile', protect, async (req, res) => {
       bio: user.bio || '',
       avatar: user.avatar || '',
       role: user.role,
-      points: user.points
+      points: user.points,
+      bugsReported: user.bugsReported || 0,
+      criticalFinds: user.criticalFinds || 0,
+      totalRewards: user.totalRewards || 0,
+      bugsAccepted: bugsAccepted || 0
     });
   } catch (error) {
     console.error('Error fetching profile:', error);
@@ -85,8 +97,10 @@ router.get('/leaderboard', async (req, res) => {
         'points',
         'bugsReported',
         'criticalFinds',
-        'totalRewards'
+        'totalRewards',
+        'role'
       ],
+      where: { role: { [Op.ne]: 'admin' } }, // Exclude admin
       order: [['points', 'DESC']],
       limit: 10
     });
@@ -97,4 +111,56 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
+// Get user stats (for dashboard)
+router.get('/stats', protect, async (req, res) => {
+  try {
+    // find user just to verify they exist
+    const user = await User.findByPk(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    // 1) Total bugs reported
+    const bugsReported = await Report.count({
+      where: { reporterId: user.id }
+    });
+
+    // 2) Total critical findings
+    const criticalFinds = await Report.count({
+      where: {
+        reporterId: user.id,
+        severity: 'Critical'
+      }
+    });
+
+    // 3) Count of accepted bugs
+    const bugsAccepted = await Report.count({
+      where: {
+        reporterId: user.id,
+        status: 'Accepted'
+      }
+    });
+
+    // 4) Sum of rewards for accepted bugs
+    let rewardDiterima = await Report.sum('reward', {
+      where: {
+        reporterId: user.id,
+        status: 'Accepted'
+      }
+    });
+    // if no accepted, sum returns null
+    rewardDiterima = rewardDiterima || 0;
+
+    // return with Indonesian field names
+    res.json({
+      bugDilaporkan:  bugsReported,
+      temuanKritis:   criticalFinds,
+      rewardDiterima: parseFloat(rewardDiterima.toFixed(2)),
+      bugDiterima:    bugsAccepted
+    });
+  } catch (error) {
+    console.error('Error fetching user stats:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 module.exports = router; 

@@ -88,7 +88,8 @@ export const userAPI = {
     return api.get('/users/profile');
   },
   updateProfile: (data) => api.put('/users/profile', data),
-  getLeaderboard: () => api.get('/users/leaderboard')
+  getLeaderboard: () => api.get('/users/leaderboard'),
+  getStats: () => api.get('/users/stats')
 };
 
 export const adminAPI = {
@@ -96,20 +97,8 @@ export const adminAPI = {
   getUsers: () => api.get('/admin/users'),
   getPrograms: () => api.get('/admin/programs'),
   getReports: () => api.get('/admin/reports'),
-  getReportDetail: (id) => {
-    return axios.get(`${API_URL}/admin/reports/${id}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-  },
-  verifyReport: (id, data) => {
-    return axios.put(`${API_URL}/admin/reports/${id}/verify`, data, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    });
-  },
+  getReportDetail: (id) => api.get(`/admin/reports/${id}`),
+  verifyReport: (id, data) => api.put(`/admin/reports/${id}/verify`, data),
   getReportPDF: (id) => {
     return `${API_URL}/admin/reports/${id}/pdf`;
   }
