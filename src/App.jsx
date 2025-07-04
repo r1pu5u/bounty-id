@@ -62,8 +62,12 @@ function App() {
         <nav className="navbar">
           <div className="nav-brand">
             <Link to="/" onClick={closeMobileMenu}>
-              <img src="/logo.png" alt="BugBountyID" />
-            </Link>
+            <img
+              src="/logo.png"
+              alt="BugBountyID"
+              style={{ width: '120px', height: 'auto' }}   // limit width, keep aspect ratio
+            />
+          </Link>
           </div>
           <button 
             className={`mobile-menu-button ${isMobileMenuOpen ? 'active' : ''}`}
