@@ -7,7 +7,7 @@ const app = express();
 
 // Update CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || '*',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -27,6 +27,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/programs', require('./routes/program'));
 app.use('/api/reports', require('./routes/report'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/payments', require('./routes/payment'));
 
 // Serve static files from uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

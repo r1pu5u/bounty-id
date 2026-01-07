@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { User, Program, Report } = require('../models');
+const { User, Program, Report, Payment } = require('../models');
 const { protect, admin } = require('../middleware/auth');
 const path = require('path');
 const fs = require('fs');
@@ -50,6 +50,35 @@ router.get('/users', protect, admin, async (req, res) => {
     res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Update user (admin only) - e.g., change role
+router.put('/users/:id', protect, admin, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+    const { role, phone, bio } = req.body;
+    await user.update({ role: role || user.role, phone: phone || user.phone, bio: bio || user.bio });
+    const safe = user.toJSON();
+    delete safe.password;
+    res.json(safe);
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete user (admin only)
+router.delete('/users/:id', protect, admin, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User tidak ditemukan' });
+    await user.destroy();
+    res.json({ message: 'User berhasil dihapus' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -127,7 +156,7 @@ router.get('/reports/:id', async (req, res) => {
 });
 
 // Verify report
-router.put('/reports/:id/verify', async (req, res) => {
+router.put('/reports/:id/verify', protect, admin, async (req, res) => {
   try {
     const { status, verificationNote, reward } = req.body;
     const report = await Report.findByPk(req.params.id);
@@ -136,12 +165,28 @@ router.put('/reports/:id/verify', async (req, res) => {
       return res.status(404).json({ message: 'Laporan tidak ditemukan' });
     }
 
+    // Update report fields
     await report.update({
       status,
       verificationNote,
       verifiedAt: new Date(),
       reward: reward !== undefined ? reward : report.reward
     });
+
+    // Do not auto-create payment here. Admin will explicitly send bounty using the dedicated endpoint.
+    // Still increment user's totalRewards so dashboard reflects awarded amount
+    if (status === 'Accepted' && reward && Number(reward) > 0) {
+      try {
+        const user = await User.findByPk(report.reporterId);
+        if (user) {
+          const current = parseFloat(user.totalRewards || 0);
+          user.totalRewards = current + Number(reward);
+          await user.save();
+        }
+      } catch (err) {
+        console.error('Error updating user totalRewards:', err);
+      }
+    }
 
     res.json({ message: 'Laporan berhasil diverifikasi' });
   } catch (error) {
@@ -150,6 +195,46 @@ router.put('/reports/:id/verify', async (req, res) => {
       message: 'Error memverifikasi laporan',
       error: error.message 
     });
+  }
+});
+
+// Admin action: send bounty for an accepted report
+router.post('/reports/:id/send-bounty', protect, admin, async (req, res) => {
+  try {
+    const report = await Report.findByPk(req.params.id);
+    if (!report) return res.status(404).json({ message: 'Laporan tidak ditemukan' });
+    if (report.status !== 'Accepted') return res.status(400).json({ message: 'Laporan belum diterima' });
+
+    // find reporter and their stored payment details
+    const user = await User.findByPk(report.reporterId);
+    if (!user) return res.status(404).json({ message: 'Reporter tidak ditemukan' });
+
+    // determine payment method & details from user's profile
+    let method = 'bank';
+    let details = '';
+    if (user.bankAccountNumber) {
+      method = 'bank';
+      details = `${user.bankName || ''} • ${user.bankAccountNumber} • ${user.bankAccountHolder || ''}`.trim();
+    } else if (user.paypalEmail) {
+      method = 'paypal';
+      details = user.paypalEmail;
+    } else {
+      return res.status(400).json({ message: 'Reporter belum memasukkan detail pembayaran' });
+    }
+
+    // create payment record
+    const payment = await Payment.create({
+      userId: user.id,
+      amount: Number(report.reward || 0),
+      method,
+      details,
+      status: 'Pending'
+    });
+
+    res.status(201).json(payment);
+  } catch (error) {
+    console.error('Error sending bounty:', error);
+    res.status(500).json({ message: 'Gagal mengirim bounty' });
   }
 });
 

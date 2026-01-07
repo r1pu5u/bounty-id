@@ -15,16 +15,17 @@ function Leaderboard() {
     try {
       setLoading(true)
       const response = await userAPI.getLeaderboard()
-      // Filter user dengan role admin
-      const filtered = response.data.filter(user => user.role !== 'admin')
-      // Transform data untuk menambahkan informasi tambahan
-      const transformedData = filtered.map((user, index) => ({
+      // Backend returns top users ordered by points; defensively sort again
+      const list = (response.data || []).slice().sort((a, b) => (b.points || 0) - (a.points || 0))
+      // Transform data for display
+      const transformedData = list.map((user, index) => ({
+        id: user.id,
         rank: index + 1,
         username: user.username,
-        points: user.points || 0,
-        bugsReported: user.bugsReported || 0,
-        criticalFinds: user.criticalFinds || 0,
-        totalRewards: formatReward(user.totalRewards || 0)
+        points: Number(user.points || 0),
+        bugsReported: Number(user.bugsReported || 0),
+        criticalFinds: Number(user.criticalFinds || 0),
+        totalRewards: Number(user.totalRewards || 0)
       }))
       setHackers(transformedData)
     } catch (err) {
@@ -36,9 +37,7 @@ function Leaderboard() {
   }
 
   // Helper function untuk format reward
-  const formatReward = (amount) => {
-    return `Rp ${amount.toLocaleString('id-ID')}`
-  }
+  const formatReward = (amount) => `Rp ${Number(amount || 0).toLocaleString('id-ID')}`
 
   if (loading) {
     return (
@@ -84,7 +83,7 @@ function Leaderboard() {
             </thead>
             <tbody>
               {hackers.map((hacker) => (
-                <tr key={hacker.rank} className={hacker.rank <= 3 ? 'top-three' : ''}>
+                <tr key={hacker.id || hacker.rank} className={hacker.rank <= 3 ? 'top-three' : ''}>
                   <td>
                     <span className={`rank rank-${hacker.rank}`}>
                       {hacker.rank}
@@ -98,7 +97,7 @@ function Leaderboard() {
                   <td>{hacker.points.toLocaleString()}</td>
                   <td>{hacker.bugsReported}</td>
                   <td>{hacker.criticalFinds}</td>
-                  <td>{hacker.totalRewards}</td>
+                  <td>{formatReward(hacker.totalRewards)}</td>
                 </tr>
               ))}
             </tbody>

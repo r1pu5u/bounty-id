@@ -56,7 +56,7 @@ router.get('/profile', protect, async (req, res) => {
 // Update user profile
 router.put('/profile', protect, async (req, res) => {
   try {
-    const { fullName, phone, bio, avatar } = req.body;
+    const { fullName, phone, bio, avatar, bankName, bankAccountNumber, bankAccountHolder, paypalEmail } = req.body;
     const user = await User.findByPk(req.user.id);
 
     if (!user) {
@@ -68,7 +68,11 @@ router.put('/profile', protect, async (req, res) => {
       username: fullName,
       phone,
       bio,
-      avatar
+      avatar,
+      bankName,
+      bankAccountNumber,
+      bankAccountHolder,
+      paypalEmail
     });
 
     res.json({
@@ -87,24 +91,32 @@ router.put('/profile', protect, async (req, res) => {
   }
 });
 
-// Get leaderboard
+// Get leaderboard (dynamic points calculated from accepted reports)
 router.get('/leaderboard', async (req, res) => {
   try {
-    const users = await User.findAll({
-      attributes: [
-        'id', 
-        'username', 
-        'points',
-        'bugsReported',
-        'criticalFinds',
-        'totalRewards',
-        'role'
-      ],
-      where: { role: { [Op.ne]: 'admin' } }, // Exclude admin
-      order: [['points', 'DESC']],
-      limit: 10
-    });
-    res.json(users);
+    // point mapping: Critical 40, High 20, Medium 10, Low 5
+    const sql = `
+      SELECT u.id, u.username,
+        COALESCE(SUM(CASE
+          WHEN UPPER(r.severity) = 'CRITICAL' THEN 40
+          WHEN UPPER(r.severity) = 'HIGH' THEN 20
+          WHEN UPPER(r.severity) = 'MEDIUM' THEN 10
+          WHEN UPPER(r.severity) = 'LOW' THEN 5
+          ELSE 0 END), 0) AS points,
+        COUNT(r.id) AS bugsReported,
+        COALESCE(SUM(CASE WHEN UPPER(r.severity) = 'CRITICAL' THEN 1 ELSE 0 END), 0) AS criticalFinds,
+        COALESCE(SUM(r.reward), 0) AS totalRewards
+      FROM Users u
+      LEFT JOIN Reports r ON r.reporterId = u.id AND UPPER(r.status) = 'ACCEPTED'
+      WHERE u.role <> 'admin'
+      GROUP BY u.id, u.username
+      ORDER BY points DESC
+      LIMIT 10
+    `;
+
+    const { sequelize } = require('../config/db');
+    const [results] = await sequelize.query(sql);
+    res.json(results);
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     res.status(500).json({ message: 'Server error' });

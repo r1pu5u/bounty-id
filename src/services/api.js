@@ -96,12 +96,21 @@ export const adminAPI = {
   getStats: () => api.get('/admin/stats'),
   getUsers: () => api.get('/admin/users'),
   getPrograms: () => api.get('/admin/programs'),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
   getReports: () => api.get('/admin/reports'),
   getReportDetail: (id) => api.get(`/admin/reports/${id}`),
   verifyReport: (id, data) => api.put(`/admin/reports/${id}/verify`, data),
   getReportPDF: (id) => {
     return `${API_URL}/admin/reports/${id}/pdf`;
   }
+  ,
+  sendBounty: (id) => api.post(`/admin/reports/${id}/send-bounty`)
+};
+
+export const paymentAPI = {
+  getMyPayments: () => api.get('/payments'),
+  createPayment: (data) => api.post('/payments', data)
 };
 
 export default api; 

@@ -19,6 +19,7 @@ services:
       context: ./backend
     ports:
       - "5000:5000"
+    restart: always
     environment:
       DB_HOST: db
       DB_USER: appuser
@@ -31,10 +32,19 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.frontend
+    # frontend will be served via a reverse-proxy (nginx) service below
+    depends_on:
+      - backend
+
+  proxy:
+    image: nginx:1.27-alpine
     ports:
       - "80:80"
     depends_on:
+      - frontend
       - backend
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   db_data:

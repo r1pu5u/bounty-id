@@ -21,6 +21,7 @@ import Payment from './pages/Payment'
 import ReportDetail from './pages/ReportDetail'
 import { useNavigate } from 'react-router-dom'
 import AdminPrograms from './pages/AdminPrograms'
+import AdminUsers from './pages/AdminUsers'
 
 function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -79,7 +80,7 @@ function App() {
           </button>
           <div className={`nav-links ${isMobileMenuOpen ? 'active' : ''}`}>
             <Link to="/program" onClick={closeMobileMenu}>Program</Link>
-            <Link to="/researchers" onClick={closeMobileMenu}>Peneliti</Link>
+            
             <Link to="/my-reports" onClick={closeMobileMenu}>Laporan</Link>
             <Link to="/leaderboard" onClick={closeMobileMenu}>Leaderboard</Link>
             
@@ -152,6 +153,14 @@ function App() {
             element={
               <AdminRoute>
                 <AdminPrograms />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminRoute>
+                <AdminUsers />
               </AdminRoute>
             }
           />

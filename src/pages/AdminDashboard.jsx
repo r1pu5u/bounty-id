@@ -157,7 +157,7 @@ function AdminDashboard() {
       <div className="dashboard-actions">
         <button className="dashboard-action-btn" onClick={handleKelolaProgram}>Kelola Program</button>
         <button className="dashboard-action-btn">Verifikasi Laporan</button>
-        <button className="dashboard-action-btn">Kelola Pengguna</button>
+  <button className="dashboard-action-btn" onClick={() => navigate('/admin/users')}>Kelola Pengguna</button>
       </div>
 
       <h2 style={{marginTop: '3rem', marginBottom: '1.5rem'}}>Daftar Laporan Terbaru</h2>

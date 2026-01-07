@@ -28,6 +28,8 @@ function ReportDetail() {
   const [status, setStatus] = useState('');
   const [pdfLoading, setPdfLoading] = useState(false);
   const [payout, setPayout] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('bank');
+  const [paymentDetails, setPaymentDetails] = useState('');
 
   // Tambahkan state untuk user
   const [user, setUser] = useState(null);
@@ -68,6 +70,18 @@ function ReportDetail() {
       fetchReportDetail();
     } catch (err) {
       setError(err.response?.data?.message || 'Gagal memverifikasi laporan');
+    }
+  };
+
+  const handleSendBounty = async () => {
+    try {
+      setError('');
+      const res = await adminAPI.sendBounty(id);
+      alert('Bounty dibuat: ID ' + res.data.id);
+      // optionally refresh report or payments
+    } catch (err) {
+      console.error('Error sending bounty:', err);
+      setError(err.response?.data?.message || 'Gagal mengirim bounty');
     }
   };
 
@@ -208,6 +222,9 @@ function ReportDetail() {
                 style={{ width: '100%', marginTop: '0.5rem' }}
                 disabled={status === 'Accepted'}
               />
+              <p className="muted small" style={{ marginTop: '8px' }}>
+                Setelah laporan diterima, klik "Kirim Bounty" untuk membuat pembayaran menggunakan detail pembayaran yang sudah disimpan oleh reporter.
+              </p>
             </div>
             <div className="verification-actions">
               <button 
@@ -224,6 +241,14 @@ function ReportDetail() {
                 Tolak
               </button>
             </div>
+          </div>
+        )}
+
+        {report.status === 'Accepted' && user?.role !== 'user' && (
+          <div style={{ marginTop: '1rem' }}>
+            <button className="verify-btn accept" onClick={handleSendBounty}>
+              Kirim Bounty
+            </button>
           </div>
         )}
 

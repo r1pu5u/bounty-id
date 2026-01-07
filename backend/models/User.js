@@ -35,6 +35,29 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  bankName: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'bank_name'
+  },
+  bankAccountNumber: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'bank_account_number'
+  },
+  bankAccountHolder: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'bank_account_holder'
+  },
+  paypalEmail: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    field: 'paypal_email',
+    validate: {
+      isEmail: true
+    }
+  },
   role: {
     type: DataTypes.ENUM('user', 'admin'),
     defaultValue: 'user'
